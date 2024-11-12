@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "start": "vite preview --host 0.0.0.0 --port $PORT",
+    "start": "cross-env NODE_ENV=production tsx server/production.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "cross-env NODE_ENV=development tsx server/index.ts"

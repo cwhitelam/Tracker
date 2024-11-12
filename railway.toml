@@ -4,6 +4,6 @@ buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm run start"
-healthcheckPath = "/"
+healthcheckPath = "/api/crypto/price"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE" 
