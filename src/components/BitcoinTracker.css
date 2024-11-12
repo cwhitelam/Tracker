@@ -1,0 +1,44 @@
+.bitcoin-value-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.bitcoin-value-title {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.value-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bitcoin-value-amount {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.bitcoin-value-text {
+  font-size: 1.5rem;
+}
+
+.bitcoin-value-signature {
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.gold-text {
+  color: #ffd700;
+  text-decoration: none;
+}
+
+.gold-text:hover {
+  text-decoration: underline;
+} 
