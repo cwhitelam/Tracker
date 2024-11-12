@@ -137,14 +137,14 @@ export function BitcoinTracker() {
                                             : 'bg-red-100 dark:bg-red-900/30'
                                             }`}
                                     >
-                                        <h4 className="text-sm font-semibold mb-2 flex items-center justify-center">
+                                        <h4 className="text-xs sm:text-sm font-semibold mb-2 flex items-center justify-center">
                                             <span className="block sm:hidden mr-1">
                                                 {profitLoss && profitLoss >= 0 ?
                                                     <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> :
                                                     <HiArrowTrendingDown className="text-sm text-red-600 dark:text-red-400" />
                                                 }
                                             </span>
-                                            Total Return
+                                            Total
                                         </h4>
                                         <div className={`text-4xl font-bold ${profitLoss && profitLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                             }`}>
@@ -172,14 +172,14 @@ export function BitcoinTracker() {
                                             : 'bg-red-100 dark:bg-red-900/30'
                                             }`}
                                     >
-                                        <h4 className="text-sm font-semibold mb-2 flex items-center justify-center">
+                                        <h4 className="text-xs sm:text-sm font-semibold mb-2 flex items-center justify-center">
                                             <span className="block sm:hidden mr-1">
                                                 {dailyChange && dailyChange >= 0 ?
                                                     <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> :
                                                     <HiArrowTrendingDown className="text-sm text-red-600 dark:text-red-400" />
                                                 }
                                             </span>
-                                            Today's Change
+                                            Today
                                         </h4>
                                         <div className={`text-4xl font-bold ${dailyChange && dailyChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                             }`}>
