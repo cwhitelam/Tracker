@@ -9,8 +9,10 @@ import { AnimatingNumber } from './AnimatingNumber';
 import { FaBitcoin } from 'react-icons/fa';
 import { HiArrowTrendingUp, HiArrowTrendingDown } from 'react-icons/hi2';
 
-const AMOUNT_OF_BITCOIN = 0.00182;
-const INITIAL_INVESTMENT = 50;
+// Replace hardcoded values with environment variables
+const AMOUNT_OF_BITCOIN = Number(import.meta.env.VITE_AMOUNT_OF_BITCOIN);
+const INITIAL_INVESTMENT = Number(import.meta.env.VITE_INITIAL_INVESTMENT);
+const BIRTH_DATE = new Date(import.meta.env.VITE_BIRTH_DATE);
 
 export function BitcoinTracker() {
     const [bitcoinData, setBitcoinData] = useState<BitcoinData | null>(null);
@@ -21,7 +23,6 @@ export function BitcoinTracker() {
     const [showInfo, setShowInfo] = useState(false);
     const fetchingRef = useRef(false);
 
-    const BIRTH_DATE = new Date('2023-08-11');
     const currentDateTime = new Date();
 
     // Helper function for birthday suffix
@@ -52,7 +53,7 @@ export function BitcoinTracker() {
 
         fetchBitcoinData();
         const interval = setInterval(fetchBitcoinData, 30000);
-        
+
         return () => {
             clearInterval(interval);
             fetchingRef.current = false;
@@ -113,15 +114,15 @@ export function BitcoinTracker() {
                                 <div className="text-6xl font-bold">
                                     <AnimatingNumber value={currentValue} />
                                 </div>
-                                
+
                                 <div className="text-2xl font-bold text-gray-500 dark:text-gray-400 mt-1 flex items-center justify-center">
                                     <div className="flex items-center justify-center space-x-2">
                                         <span className="flex items-center">
                                             1<FaBitcoin className="text-bitcoin mx-1 text-2xl" />
                                         </span>
                                         <span>=</span>
-                                        <AnimatingNumber 
-                                            value={currentPrice || 0} 
+                                        <AnimatingNumber
+                                            value={currentPrice || 0}
                                             prefix="$"
                                         />
                                     </div>
@@ -138,8 +139,8 @@ export function BitcoinTracker() {
                                     >
                                         <h4 className="text-sm font-semibold mb-2 flex items-center justify-center">
                                             <span className="block sm:hidden mr-1">
-                                                {profitLoss && profitLoss >= 0 ? 
-                                                    <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> : 
+                                                {profitLoss && profitLoss >= 0 ?
+                                                    <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> :
                                                     <HiArrowTrendingDown className="text-sm text-red-600 dark:text-red-400" />
                                                 }
                                             </span>
@@ -148,8 +149,8 @@ export function BitcoinTracker() {
                                         <div className={`text-4xl font-bold ${profitLoss && profitLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                             }`}>
                                             <div className="flex items-center justify-center">
-                                                {profitLoss && profitLoss >= 0 ? 
-                                                    <HiArrowTrendingUp className="mr-1 text-3xl hidden sm:block" /> : 
+                                                {profitLoss && profitLoss >= 0 ?
+                                                    <HiArrowTrendingUp className="mr-1 text-3xl hidden sm:block" /> :
                                                     <HiArrowTrendingDown className="mr-1 text-3xl hidden sm:block" />
                                                 }
                                                 <AnimatingNumber
@@ -173,8 +174,8 @@ export function BitcoinTracker() {
                                     >
                                         <h4 className="text-sm font-semibold mb-2 flex items-center justify-center">
                                             <span className="block sm:hidden mr-1">
-                                                {dailyChange && dailyChange >= 0 ? 
-                                                    <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> : 
+                                                {dailyChange && dailyChange >= 0 ?
+                                                    <HiArrowTrendingUp className="text-sm text-green-600 dark:text-green-400" /> :
                                                     <HiArrowTrendingDown className="text-sm text-red-600 dark:text-red-400" />
                                                 }
                                             </span>
@@ -183,8 +184,8 @@ export function BitcoinTracker() {
                                         <div className={`text-4xl font-bold ${dailyChange && dailyChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                             }`}>
                                             <div className="flex items-center justify-center">
-                                                {dailyChange && dailyChange >= 0 ? 
-                                                    <HiArrowTrendingUp className="mr-1 text-3xl hidden sm:block" /> : 
+                                                {dailyChange && dailyChange >= 0 ?
+                                                    <HiArrowTrendingUp className="mr-1 text-3xl hidden sm:block" /> :
                                                     <HiArrowTrendingDown className="mr-1 text-3xl hidden sm:block" />
                                                 }
                                                 <AnimatingNumber
@@ -211,8 +212,8 @@ export function BitcoinTracker() {
                                 px-6 py-2.5 rounded-lg font-semibold
                                 transition-colors duration-200
                                 flex items-center justify-center gap-2
-                                border-2 ${showChart 
-                                    ? 'bg-bitcoin/90 text-white hover:bg-bitcoin border-bitcoin' 
+                                border-2 ${showChart
+                                    ? 'bg-bitcoin/90 text-white hover:bg-bitcoin border-bitcoin'
                                     : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700'
                                 }
                             `}
@@ -238,8 +239,8 @@ export function BitcoinTracker() {
                                 px-6 py-2.5 rounded-lg font-semibold
                                 transition-colors duration-200
                                 flex items-center justify-center gap-2
-                                border-2 ${showInfo 
-                                    ? 'bg-bitcoin/90 text-white hover:bg-bitcoin border-bitcoin' 
+                                border-2 ${showInfo
+                                    ? 'bg-bitcoin/90 text-white hover:bg-bitcoin border-bitcoin'
                                     : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700'
                                 }
                             `}

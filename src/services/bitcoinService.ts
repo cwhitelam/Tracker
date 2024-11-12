@@ -15,10 +15,10 @@ interface CacheItem<T> {
 }
 
 class BitcoinService {
-    private readonly API_KEY = import.meta.env.VITE_API_KEY;
-    private readonly BASE_URL = import.meta.env.VITE_API_URL;
+    private readonly INITIAL_PRICE = Number(import.meta.env.VITE_INITIAL_PRICE);
+    private readonly CACHE_DURATION = 900000; // 15 minutes
+    private readonly CMC_API = '/api/crypto';
     private cache: Map<string, CacheItem<any>> = new Map();
-    private readonly CACHE_DURATION = 600000; // Increase to 10 minutes
 
     private getCached<T>(key: string): T | null {
         const item = this.cache.get(key);
@@ -37,71 +37,75 @@ class BitcoinService {
         this.cache.set(key, { value, timestamp: Date.now() });
     }
 
+    private async getCurrentPriceAndChange(): Promise<{ price: number; change: number }> {
+        const cacheKey = 'priceData';
+        const cached = this.getCached<{ price: number; change: number }>(cacheKey);
+
+        if (cached !== null) {
+            return cached;
+        }
+
+        try {
+            const response = await fetch(
+                `${this.CMC_API}/price`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch current price: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('API Response:', data);
+            
+            const priceData = {
+                price: data.price,
+                change: data.change
+            };
+            
+            this.setCache(cacheKey, priceData);
+            return priceData;
+        } catch (error) {
+            console.error('Error fetching price data:', error);
+            throw error;
+        }
+    }
+
+    private generateHistoricalPrices(startDate: Date, currentPrice: number): BitcoinPriceHistory[] {
+        const days = Math.ceil((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const prices: BitcoinPriceHistory[] = [];
+        
+        // Just use the current price for all entries since we don't have historical data
+        for (let i = 0; i < days; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            
+            prices.push({
+                date: date.toLocaleDateString(),
+                price: currentPrice
+            });
+        }
+
+        return prices;
+    }
+
     async getBitcoinData(startDate: Date): Promise<BitcoinData | null> {
         const cacheKey = 'bitcoinData';
         const cached = this.getCached<BitcoinData>(cacheKey);
 
         if (cached !== null) {
-            console.log('Using cached bitcoin data');
             return cached;
         }
 
-        console.log('Fetching fresh bitcoin data');
-
         try {
-            // Combine all API calls into a single Promise.all to be more efficient
-            const [currentResponse, todayResponse, historyResponse] = await Promise.all([
-                fetch(`${this.BASE_URL}/price?fsym=BTC&tsyms=USD`, {
-                    headers: { 'authorization': `Apikey ${this.API_KEY}` }
-                }),
-                fetch(`${this.BASE_URL}/v2/histohour?fsym=BTC&tsym=USD&limit=24`, {
-                    headers: { 'authorization': `Apikey ${this.API_KEY}` }
-                }),
-                fetch(`${this.BASE_URL}/v2/histoday?fsym=BTC&tsym=USD&limit=${
-                    Math.ceil((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-                }`, {
-                    headers: { 'authorization': `Apikey ${this.API_KEY}` }
-                })
-            ]);
+            const { price: currentPrice, change } = await this.getCurrentPriceAndChange();
+            
+            // Calculate actual daily change in USD based on percentage
+            const dailyChange = (currentPrice * change) / 100;
 
-            // Log responses for debugging
-            console.log('Current Response:', await currentResponse.clone().text());
-            console.log('Today Response:', await todayResponse.clone().text());
-            console.log('History Response:', await historyResponse.clone().text());
-
-            // Check if any requests failed
-            if (!currentResponse.ok || !todayResponse.ok || !historyResponse.ok) {
-                throw new Error('One or more API requests failed');
-            }
-
-            // Parse all responses
-            const [currentData, todayData, historyData] = await Promise.all([
-                currentResponse.json(),
-                todayResponse.json(),
-                historyResponse.json()
-            ]);
-
-            // Validate data structure
-            if (!currentData?.USD) {
-                throw new Error('Invalid current price data');
-            }
-
-            if (!todayData?.Data?.Data?.[0]?.open) {
-                throw new Error('Invalid today data');
-            }
-
-            if (!historyData?.Data?.Data) {
-                throw new Error('Invalid history data');
-            }
-
-            const currentPrice = currentData.USD;
-            const openPrice = todayData.Data.Data[0].open;
-            const dailyChange = currentPrice - openPrice;
-
-            const priceHistory = historyData.Data.Data.map((item: any) => ({
-                date: new Date(item.time * 1000).toLocaleDateString(),
-                price: item.close
-            }));
+            const priceHistory = this.generateHistoricalPrices(startDate, currentPrice);
 
             const bitcoinData: BitcoinData = {
                 currentPrice,
@@ -113,10 +117,9 @@ class BitcoinService {
             return bitcoinData;
 
         } catch (error) {
-            console.error('Error fetching bitcoin data:', error);
-            console.error('API Key used:', this.API_KEY);
-            console.error('Base URL used:', this.BASE_URL);
-            return null;
+            console.error('Error generating bitcoin data:', error);
+            // You might want to show an error to the user instead of returning null
+            throw error;
         }
     }
 }
