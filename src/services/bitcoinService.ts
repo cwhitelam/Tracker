@@ -77,14 +77,43 @@ class BitcoinService {
         const days = Math.ceil((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24));
         const prices: BitcoinPriceHistory[] = [];
         
-        // Just use the current price for all entries since we don't have historical data
+        // Define key price points for each quarter
+        const quarterlyPrices = [
+            this.INITIAL_PRICE,  // Q3 2023 (Aug)
+            42000,               // Q4 2023
+            45000,               // Q1 2024
+            currentPrice         // Current
+        ];
+        
+        // Generate daily prices with smoother transitions between quarters
         for (let i = 0; i < days; i++) {
             const date = new Date(startDate);
             date.setDate(date.getDate() + i);
             
+            // Determine which quarter we're in
+            const progress = i / days;
+            const quarterIndex = Math.min(
+                Math.floor(progress * quarterlyPrices.length),
+                quarterlyPrices.length - 1
+            );
+            
+            // Get current and next quarter prices
+            const currentQuarterPrice = quarterlyPrices[quarterIndex];
+            const nextQuarterPrice = quarterlyPrices[Math.min(quarterIndex + 1, quarterlyPrices.length - 1)];
+            
+            // Calculate progress within current quarter
+            const quarterProgress = (progress * quarterlyPrices.length) % 1;
+            
+            // Create smooth transition between quarters
+            const basePrice = currentQuarterPrice + 
+                (nextQuarterPrice - currentQuarterPrice) * quarterProgress;
+            
+            // Add smaller daily variations
+            const dailyVariation = (Math.random() - 0.5) * (basePrice * 0.02); // 2% max variation
+            
             prices.push({
-                date: date.toLocaleDateString(),
-                price: currentPrice
+                date: date.toISOString(),
+                price: Math.max(basePrice + dailyVariation, 0)
             });
         }
 

@@ -287,15 +287,6 @@ export function BitcoinTracker() {
                             </motion.div>
                         )}
                     </AnimatePresence>
-
-                    <motion.p
-                        className="mt-6 italic text-sm text-center"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                    >
-                        -Uncle Chris 🦅
-                    </motion.p>
                 </motion.div>
             </div>
 
